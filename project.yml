@@ -26,6 +26,9 @@ targets:
     platform: iOS
     sources:
       - path: Helm
+      - path: Scene
+        type: folder
+        buildPhase: resources
     dependencies:
       - package: HelmCore
     info:
