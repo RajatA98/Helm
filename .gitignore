@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+
+# Generated design canvas (seeded from design/*.dc.html; rebuild rather than commit)
+design/helm-app-design.html
+
+# Local tool output
+.playwright-mcp/
+.claude/council-cache/*.json
+.claude/settings.local.json
+
+# Xcode (for when the app project lands)
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+*.ipa
+*.dSYM.zip
+
+# Node (for the scene build, if any)
+node_modules/
+
+# Secrets
+.env
+.env.*
+supabase/.env

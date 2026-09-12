@@ -1,0 +1,290 @@
+{
+  "pages": [
+    {
+      "id": "page-bow",
+      "name": "Helm at the bow"
+    },
+    {
+      "id": "page-deck",
+      "name": "Deck (no buttons)"
+    },
+    {
+      "id": "page-ship",
+      "name": "Ship view"
+    },
+    {
+      "id": "page-first",
+      "name": "First looks"
+    }
+  ],
+  "artboards": [
+    {
+      "file": "AvatarSketch.dc.html",
+      "title": "1 \u00b7 Create your captain (sketch)",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-bow"
+    },
+    {
+      "file": "MentorSketch.dc.html",
+      "title": "2 \u00b7 Meet the Captain (sketch)",
+      "x": 480,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-bow"
+    },
+    {
+      "file": "DeckBow.dc.html",
+      "title": "3 \u00b7 At the helm (tap the wheel)",
+      "x": 960,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-bow",
+      "is_interactive": true
+    },
+    {
+      "file": "DeckNight.dc.html",
+      "title": "F \u00b7 Deck, Night",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-deck"
+    },
+    {
+      "file": "DeckDay.dc.html",
+      "title": "G \u00b7 Deck, Day",
+      "x": 480,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-deck"
+    },
+    {
+      "file": "LogbookSketch.dc.html",
+      "title": "Logbook (sketch)",
+      "x": 1060,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-deck"
+    },
+    {
+      "file": "MapSketch.dc.html",
+      "title": "Treasure Map (sketch)",
+      "x": 1540,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-deck"
+    },
+    {
+      "file": "CoveSketch.dc.html",
+      "title": "The Cove (sketch)",
+      "x": 2020,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-deck"
+    },
+    {
+      "file": "ShipNight.dc.html",
+      "title": "D \u00b7 At the Helm, Night",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-ship"
+    },
+    {
+      "file": "ShipDay.dc.html",
+      "title": "E \u00b7 At the Helm, Day",
+      "x": 480,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-ship"
+    },
+    {
+      "file": "DirectionA.dc.html",
+      "title": "A \u00b7 Parchment Chart",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-first"
+    },
+    {
+      "file": "DirectionB.dc.html",
+      "title": "B \u00b7 Bold Voyage",
+      "x": 480,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-first"
+    },
+    {
+      "file": "Main.dc.html",
+      "title": "C \u00b7 Night Watch",
+      "x": 960,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-first"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "brief-bow",
+      "page": "page-bow",
+      "x": 0,
+      "y": -230,
+      "w": 1350,
+      "text": "First launch \u2192 daily home.\n1. Build your avatar and name your ship. 2. The Captain (an original mentor in the spirit of the legendary-captain archetype) asks for your goals, shrinks the huge ones to a first island, and entrusts you with his compass: bring it back when you reach the treasure. 3. Every day after: you at the helm, right at the bow. Tap the wheel to turn toward another goal; the heading, the log count and the Bosun's line all follow."
+    },
+    {
+      "id": "note-avatar",
+      "page": "page-bow",
+      "x": 0,
+      "y": 900,
+      "w": 390,
+      "text": "Create your captain\nSkin, hair, headwear, coat, plus your captain name and ship name. The same avatar steers on the deck."
+    },
+    {
+      "id": "note-mentor",
+      "page": "page-bow",
+      "x": 480,
+      "y": 900,
+      "w": 390,
+      "text": "Meet the Captain\nThe AI part of onboarding. The compass is the promise: returning it is the reward for reaching a goal's X."
+    },
+    {
+      "id": "note-bow",
+      "page": "page-bow",
+      "x": 960,
+      "y": 900,
+      "w": 390,
+      "text": "At the helm (clickable)\nShort bow deck, your avatar at the wheel. Logbook (barrel) and Maps (crate) beside you; The Cove lighthouse on the horizon. Get Hired's isle name here is sample."
+    },
+    {
+      "id": "brief-deck",
+      "page": "page-deck",
+      "x": 0,
+      "y": -230,
+      "w": 870,
+      "text": "No buttons: everything is on the ship.\nTap the LOGBOOK on the barrel to open today's Ship's Log. Tap the MAP on the chart table to unroll your treasure maps. Tap THE COVE (lighthouse, far left) to sail to your allies' base. Turn the WHEEL to steer toward another goal's island. The Bosun (crew bot) calls out from the deck."
+    },
+    {
+      "id": "note-f",
+      "page": "page-deck",
+      "x": 0,
+      "y": 900,
+      "w": 390,
+      "text": "F \u00b7 Deck, Night\nLantern light pools on the logbook so the daily action is where the light is."
+    },
+    {
+      "id": "note-g",
+      "page": "page-deck",
+      "x": 480,
+      "y": 900,
+      "w": 390,
+      "text": "G \u00b7 Deck, Day\nSame layout, bright cartoon palette."
+    },
+    {
+      "id": "brief-places",
+      "page": "page-deck",
+      "x": 1060,
+      "y": -230,
+      "w": 1350,
+      "text": "Where each object takes you (rough sketches, no style yet).\nThey get dressed in whichever look you pick: night or day."
+    },
+    {
+      "id": "note-log",
+      "page": "page-deck",
+      "x": 1060,
+      "y": 900,
+      "w": 390,
+      "text": "Logbook\nOne page per goal; bookmark ribbons switch goals. Leaks (missed tasks) sit at the bottom to patch."
+    },
+    {
+      "id": "note-map",
+      "page": "page-deck",
+      "x": 1540,
+      "y": 900,
+      "w": 390,
+      "text": "Treasure Map\nIslands = milestones, X = the goal. Tap an island for its daily tasks and what counts as reaching it."
+    },
+    {
+      "id": "note-cove",
+      "page": "page-deck",
+      "x": 2020,
+      "y": 900,
+      "w": 390,
+      "text": "The Cove\nAllies' ships docked with their hull state; ring the bell to nudge. The Code = rules and penalties the crew agreed on, plus the ledger. Names are sample."
+    },
+    {
+      "id": "brief-ship",
+      "page": "page-ship",
+      "x": 0,
+      "y": -210,
+      "w": 620,
+      "text": "You're on the ship.\nFirst-person at the helm: looking over the bow, your next island (milestone) on the horizon. Turn the wheel and the ship swings toward another goal's island (Get Hired is off to port). The Ship's Log slides up from below; drag it down to see the whole view. Leaks show on deck: water pooling, a cracked rail."
+    },
+    {
+      "id": "note-d",
+      "page": "page-ship",
+      "x": 0,
+      "y": 900,
+      "w": 390,
+      "text": "D \u00b7 At the Helm, Night\nNight Watch palette: moonlit sea, lantern-lit rails, brass wheel.\n+ Moody and cinematic; lanterns and glow make progress feel earned.\n\u2212 Night all the time; could shift to day/dusk with the real clock."
+    },
+    {
+      "id": "note-e",
+      "page": "page-ship",
+      "x": 480,
+      "y": 900,
+      "w": 390,
+      "text": "E \u00b7 At the Helm, Day\nBold Voyage palette: bright sky, cartoon outlines, chunky wheel.\n+ Most playful; leaks and sinking read like a game.\n\u2212 Louder; less 'premium' as a portfolio piece."
+    },
+    {
+      "id": "brief",
+      "page": "page-first",
+      "x": 0,
+      "y": -210,
+      "w": 620,
+      "text": "First looks (before the ship view).\nSame home screen, three directions: the wheel steers between goals, the Ship's Log is split by goal, the hull shows missed-task damage, and a crew bot (the Bosun) nudges you."
+    },
+    {
+      "id": "note-a",
+      "page": "page-first",
+      "x": 0,
+      "y": 900,
+      "w": 390,
+      "text": "A \u00b7 Parchment Chart\nAn old captain's chart: engraved ink, compass lines, wax-red accents.\n+ Most 'treasure map' of the three; calm and literary.\n\u2212 Lowest contrast; can feel quiet for a game with sinking ships."
+    },
+    {
+      "id": "note-b",
+      "page": "page-first",
+      "x": 480,
+      "y": 900,
+      "w": 390,
+      "text": "B \u00b7 Bold Voyage\nAnime-adventure energy: flat bright color, thick outlines, hard shadows.\n+ Most game-like; streaks, leaks and sinking read instantly.\n\u2212 Loudest; risks feeling childish over months of daily use."
+    },
+    {
+      "id": "note-c",
+      "page": "page-first",
+      "x": 960,
+      "y": 900,
+      "w": 390,
+      "text": "C \u00b7 Night Watch\nNight at sea: brass wheel rising over the horizon, lantern-lit check-offs.\n+ Most distinctive and polished; glow makes 'done' feel earned.\n\u2212 Dark-only mood; the playful side has to come from motion."
+    }
+  ],
+  "launch": {
+    "view": "canvas",
+    "page": "page-bow"
+  }
+}

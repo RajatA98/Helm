@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Manrope:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin: 0; background: #0a1220; }
+    a { color: #e8b04b; } a:hover { color: #f3c978; }
+    .sky {
+      background-color: transparent;
+      background-image:
+        radial-gradient(circle at 50% 100%, rgba(232, 176, 75, 0.16) 0, rgba(232, 176, 75, 0) 190px),
+        radial-gradient(1px 1px at 24px 36px, rgba(255, 255, 255, 0.75) 50%, transparent 60%),
+        radial-gradient(1px 1px at 92px 118px, rgba(255, 255, 255, 0.45) 50%, transparent 60%),
+        radial-gradient(1.4px 1.4px at 148px 22px, rgba(255, 255, 255, 0.65) 50%, transparent 60%),
+        radial-gradient(1px 1px at 262px 64px, rgba(255, 255, 255, 0.5) 50%, transparent 60%),
+        radial-gradient(1.2px 1.2px at 334px 138px, rgba(255, 255, 255, 0.6) 50%, transparent 60%),
+        radial-gradient(1px 1px at 366px 28px, rgba(255, 255, 255, 0.5) 50%, transparent 60%),
+        radial-gradient(1px 1px at 46px 176px, rgba(255, 255, 255, 0.35) 50%, transparent 60%),
+        radial-gradient(1px 1px at 214px 160px, rgba(255, 255, 255, 0.3) 50%, transparent 60%);
+    }
+  </style>
+</helmet>
+<div style="width: 390px; height: 844px; overflow: hidden; position: relative; display: flex; flex-direction: column; background: linear-gradient(180deg, #0b1526 0%, #0a1220 40%, #0b1828 100%); font-family: 'Manrope', 'Helvetica Neue', sans-serif; color: #e9e4d8;">
+
+  <div style="padding: 56px 22px 0; display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; flex-direction: column; gap: 2px;">
+      <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #8b93a3;">Thu · 10 Sep</div>
+      <div style="font-family: 'Pirata One', 'Times New Roman', serif; font-size: 38px; line-height: 1; color: #e8b04b;">The Helm</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 1px;">
+        <div style="font-size: 15px; font-weight: 700;">Hull 82%</div>
+        <div style="font-size: 12px; font-weight: 700; color: #e8745a;">2 leaks</div>
+      </div>
+      <svg width="46" height="46" viewBox="0 0 46 46" style="display: block;">
+        <circle cx="23" cy="23" r="19" style="fill: none; stroke: rgba(255, 255, 255, 0.1); stroke-width: 4;"></circle>
+        <circle cx="23" cy="23" r="19" transform="rotate(-90 23 23)" style="fill: none; stroke: #e8b04b; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 98 120;"></circle>
+        <g transform="translate(14 13)" style="fill: none; stroke: #e9e4d8; stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round;">
+          <path d="M1 13h16l-2.2 4H3.2z"></path><path d="M9 1v12"></path><path d="M9 2l5.5 9H9z"></path>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="sky" style="position: relative; margin-top: 6px; height: 250px; flex-shrink: 0;">
+    <svg width="390" height="250" viewBox="-195 -20 390 250" style="display: block;">
+      <defs>
+        <g id="spokeC">
+          <line x1="0" y1="-26" x2="0" y2="-128" style="stroke: #c9a15a; stroke-width: 6; stroke-linecap: round;"></line>
+          <line x1="0" y1="-133" x2="0" y2="-146" style="stroke: #c9a15a; stroke-width: 12; stroke-linecap: round;"></line>
+        </g>
+      </defs>
+      <g transform="translate(0 180)" style="filter: drop-shadow(0 0 10px rgba(232, 176, 75, 0.35));">
+        <circle r="164" style="fill: none; stroke: rgba(232, 176, 75, 0.4); stroke-width: 1.2; stroke-dasharray: 1.2 8.4;"></circle>
+        <use href="#spokeC"></use>
+        <use href="#spokeC" transform="rotate(45)"></use>
+        <use href="#spokeC" transform="rotate(90)"></use>
+        <use href="#spokeC" transform="rotate(135)"></use>
+        <use href="#spokeC" transform="rotate(180)"></use>
+        <use href="#spokeC" transform="rotate(225)"></use>
+        <use href="#spokeC" transform="rotate(270)"></use>
+        <use href="#spokeC" transform="rotate(315)"></use>
+        <circle r="100" style="fill: none; stroke: #c9a15a; stroke-width: 12;"></circle>
+        <circle r="100" style="fill: none; stroke: #0a1220; stroke-width: 2;"></circle>
+        <circle r="26" style="fill: #0f1a2b; stroke: #c9a15a; stroke-width: 4;"></circle>
+        <circle r="8" style="fill: #e8b04b;"></circle>
+      </g>
+      <circle cx="0" cy="22" r="4" style="fill: #f3c978; filter: drop-shadow(0 0 6px rgba(243, 201, 120, 0.9));"></circle>
+      <text x="0" y="6" style="font-family: 'Pirata One', 'Times New Roman', serif; font-size: 27px; fill: #f3c978; text-anchor: middle;">Get Fit</text>
+      <text x="-146" y="46" style="font-family: 'Manrope', 'Helvetica Neue', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #8b93a3; text-anchor: middle;">‹ GET HIRED</text>
+      <text x="146" y="46" style="font-family: 'Manrope', 'Helvetica Neue', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #5c6577; text-anchor: middle;">NEW COURSE +</text>
+    </svg>
+  </div>
+  <div style="height: 1px; background: linear-gradient(90deg, rgba(232, 176, 75, 0) 0%, rgba(232, 176, 75, 0.55) 50%, rgba(232, 176, 75, 0) 100%);"></div>
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 22px 0;">
+    <div style="font-size: 14px; color: #8b93a3;">Bound for <span style="color: #e9e4d8; font-weight: 700;">Heal the Shoulders</span></div>
+    <svg width="86" height="12" viewBox="0 0 86 12" style="display: block;">
+      <line x1="6" y1="6" x2="76" y2="6" style="stroke: #3a4558; stroke-width: 1.5; stroke-dasharray: 2 4;"></line>
+      <circle cx="6" cy="6" r="4.5" style="fill: #e8b04b;"></circle>
+      <circle cx="30" cy="6" r="3.5" style="fill: #0a1220; stroke: #5c6577; stroke-width: 1.5;"></circle>
+      <circle cx="54" cy="6" r="3.5" style="fill: #0a1220; stroke: #5c6577; stroke-width: 1.5;"></circle>
+      <path d="M76 2l8 8M84 2l-8 8" style="stroke: #8b93a3; stroke-width: 1.8; stroke-linecap: round;"></path>
+    </svg>
+  </div>
+
+  <div style="padding: 18px 22px 0; display: flex; flex-direction: column; gap: 8px;">
+    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+      <div style="font-family: 'Pirata One', 'Times New Roman', serif; font-size: 26px; line-height: 1;">Ship's Log</div>
+      <div style="font-size: 13px; font-weight: 700; color: #8b93a3;">Get Fit · 2 of 3</div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 14px; min-height: 50px; padding: 0 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.035); border: 1px solid rgba(255, 255, 255, 0.07);">
+      <div style="width: 26px; height: 26px; border-radius: 50%; background: #e8b04b; box-shadow: 0 0 12px rgba(232, 176, 75, 0.5); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <svg width="15" height="15" viewBox="0 0 24 24" style="fill: none; stroke: #0a1220; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>
+      </div>
+      <div style="font-size: 15px; font-weight: 500; color: #6f7888; text-decoration: line-through;">Shoulder PT — band rotations</div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 14px; min-height: 50px; padding: 0 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.035); border: 1px solid rgba(255, 255, 255, 0.07);">
+      <div style="width: 26px; height: 26px; border-radius: 50%; background: #e8b04b; box-shadow: 0 0 12px rgba(232, 176, 75, 0.5); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <svg width="15" height="15" viewBox="0 0 24 24" style="fill: none; stroke: #0a1220; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round;"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>
+      </div>
+      <div style="font-size: 15px; font-weight: 500; color: #6f7888; text-decoration: line-through;">Mobility, 15 minutes</div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 14px; min-height: 56px; padding: 0 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(232, 176, 75, 0.28);">
+      <div style="width: 26px; height: 26px; box-sizing: border-box; border-radius: 50%; border: 2px solid #c9a15a; flex-shrink: 0;"></div>
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <div style="font-size: 15px; font-weight: 700;">Lower-body strength session</div>
+        <div style="display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #e8b04b;">
+          <svg width="13" height="13" viewBox="0 0 24 24" style="fill: none; stroke: #e8b04b; stroke-width: 2; stroke-linejoin: round;"><path d="M3 8h3.5l2-2.5h7l2 2.5H21v11H3z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>
+          <span>Photo proof</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between; min-height: 46px; padding: 0 14px; border-radius: 12px; border: 1px dashed rgba(255, 255, 255, 0.14);">
+      <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #8b93a3;">Get Hired · 0 of 2</div>
+      <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none; stroke: #8b93a3; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;"><path d="M9 5l7 7-7 7"></path></svg>
+    </div>
+  </div>
+
+  <div style="padding: 16px 22px 0; display: flex; gap: 10px; align-items: flex-start;">
+    <svg width="20" height="20" viewBox="0 0 24 24" style="flex-shrink: 0; margin-top: 1px; fill: none; stroke: #e8b04b; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;">
+      <path d="M9 3h6"></path><path d="M12 3v3"></path><path d="M7.5 6h9l1 12h-11z"></path><path d="M5 21h14"></path><path d="M12 10.5v3.5"></path>
+    </svg>
+    <div style="font-size: 14px; line-height: 1.45; color: #aab1bd; text-wrap: pretty;"><span style="font-weight: 700; color: #e9e4d8;">The Bosun</span> · No workout logged yet, Captain. Legs before sundown — and bring a picture.</div>
+  </div>
+
+  <div style="margin-top: auto; display: flex; justify-content: space-around; padding: 10px 28px 30px; background: rgba(6, 11, 20, 0.85); border-top: 1px solid rgba(255, 255, 255, 0.06);">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" style="fill: none; stroke: #e8b04b; stroke-width: 1.8; stroke-linecap: round;"><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="1.6"></circle><path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"></path></svg>
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #e8b04b;">Helm</div>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" style="fill: none; stroke: #6f7888; stroke-width: 1.8; stroke-linejoin: round;"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"></path><path d="M9 4v14M15 6v14"></path></svg>
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #6f7888;">Maps</div>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" style="fill: none; stroke: #6f7888; stroke-width: 1.8; stroke-linecap: round;"><circle cx="9" cy="8" r="3.2"></circle><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"></path><circle cx="17" cy="9" r="2.5"></circle><path d="M16.5 13.6c2.7.3 4.5 2.3 4.5 5.4"></path></svg>
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #6f7888;">Allies</div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>
