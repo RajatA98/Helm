@@ -117,6 +117,9 @@ final class SceneBridge {
     // MARK: Helpers
 
     private func append(_ direction: Direction, _ summary: String) {
+        #if DEBUG
+        print("[helm-bridge] \(direction == .toScene ? "→" : "←") \(summary)")
+        #endif
         log.append(LogEntry(at: Date(), direction: direction, summary: summary))
         if log.count > Self.logCapacity {
             log.removeFirst(log.count - Self.logCapacity)
