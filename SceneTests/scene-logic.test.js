@@ -132,6 +132,24 @@ test('parseHexColor accepts #rgb and #rrggbb and rejects junk', () => {
   assert.equal(L.parseHexColor(undefined), null);
 });
 
+test('ship motion is scaled down to a subtle amplitude by MOTION_SCALE', () => {
+  assert.ok(L.MOTION_SCALE > 0.25 && L.MOTION_SCALE < 0.4, `MOTION_SCALE ${L.MOTION_SCALE} should be about a third`);
+  const m = L.motionAmplitudes(false);
+  assert.equal(m.heave, L.BASE_MOTION.heave * L.MOTION_SCALE);
+  assert.equal(m.pitch, L.BASE_MOTION.pitch * L.MOTION_SCALE);
+  assert.equal(m.roll, L.BASE_MOTION.roll * L.MOTION_SCALE);
+  assert.ok(m.cameraHeave > 0 && m.cameraPitch > 0 && m.cameraRoll > 0);
+});
+
+test('Reduce Motion makes the ship and the camera stiller still', () => {
+  const normal = L.motionAmplitudes(false);
+  const reduced = L.motionAmplitudes(true);
+  for (const k of ['heave', 'pitch', 'roll', 'cameraHeave', 'cameraPitch', 'cameraRoll']) {
+    assert.ok(reduced[k] < normal[k], `${k}: ${reduced[k]} should be below ${normal[k]}`);
+    assert.ok(reduced[k] > 0, `${k} stays present, not frozen`);
+  }
+});
+
 test('a fixed mock state normalizes identically every time', () => {
   const a = JSON.stringify(L.normalizeState(L.MOCK_STATE));
   const b = JSON.stringify(L.normalizeState(JSON.parse(JSON.stringify(L.MOCK_STATE))));

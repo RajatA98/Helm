@@ -105,6 +105,29 @@
     return Object.assign({ version: VERSION, type }, extra || {});
   }
 
+  /**
+   * How much the ship rocks. The wave-driven heave, pitch and roll are multiplied by
+   * MOTION_SCALE so the motion is present but subtle: this screen is watched every day
+   * and must never distract or nauseate. The camera follows the (already scaled) ship
+   * through the camera* ratios. Under Reduce Motion everything is stiller again.
+   */
+  const MOTION_SCALE = 1 / 3;
+  const BASE_MOTION = Object.freeze({ heave: 0.7, pitch: 0.6, roll: 0.6, cameraHeave: 0.8, cameraPitch: 1.2, cameraRoll: 0.35 });
+  const REDUCED_SHIP_FACTOR = 0.3;
+  const REDUCED_CAMERA_FACTOR = 0.5;
+  function motionAmplitudes(reduceMotion) {
+    const ship = MOTION_SCALE * (reduceMotion ? REDUCED_SHIP_FACTOR : 1);
+    const cam = reduceMotion ? REDUCED_CAMERA_FACTOR : 1;
+    return {
+      heave: BASE_MOTION.heave * ship,
+      pitch: BASE_MOTION.pitch * ship,
+      roll: BASE_MOTION.roll * ship,
+      cameraHeave: BASE_MOTION.cameraHeave * cam,
+      cameraPitch: BASE_MOTION.cameraPitch * cam,
+      cameraRoll: BASE_MOTION.cameraRoll * cam,
+    };
+  }
+
   function parseHexColor(hex) {
     if (typeof hex !== 'string') return null;
     const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(hex.trim());
@@ -133,5 +156,6 @@
   return {
     VERSION, conditionFor, normalizeState, effectiveHours, conditionVisuals,
     headingBearing, solar, buildEvent, parseHexColor, MOCK_STATE, DEFAULT_AVATAR, DEFAULT_SHIP,
+    MOTION_SCALE, BASE_MOTION, motionAmplitudes,
   };
 });

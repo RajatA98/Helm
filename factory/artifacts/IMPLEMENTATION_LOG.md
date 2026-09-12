@@ -67,3 +67,10 @@
 - **Tests:** `testUnstrikeReopensAStruckTask`, `testUnstrikeWithUnknownIdChangesNothing` in HelmSessionTests (red first, then green).
 - **Files:** `HelmCore/Sources/HelmCore/HelmSession.swift` (`unstrike(taskID:)`), `Helm/Views/LogPlaceholderSheet.swift` (a done task is tappable again and reopens; VoiceOver label says "Tap to undo").
 - **Note:** PRD requirement 25 limits undo to before midnight; that boundary arrives with the rollover in Phase 2.
+
+### Polish 1 — 2026-09-12: the ship rocks less
+
+- **Found by:** the user on a phone: the ship rocked too much for a screen watched daily.
+- **Tests:** `scene-logic.test.js`: `MOTION_SCALE` is about a third and `motionAmplitudes(false)` scales the base heave, pitch and roll by it; `motionAmplitudes(true)` (Reduce Motion) is smaller again for the ship and the camera, and never zero (red first, then green).
+- **Files:** `Scene/scene-logic.js` (`MOTION_SCALE`, `BASE_MOTION`, `motionAmplitudes`), `Scene/scene.js` (the frame loop uses the amplitudes; reads `prefers-reduced-motion` and follows changes).
+- **Summary:** wave-driven heave, pitch and roll are a third of what they were; the camera follows the already-calmer ship. Listing from leaks and the sinking offset are condition, not rocking, and are unchanged.

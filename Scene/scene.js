@@ -784,6 +784,13 @@
   const camBase = { pos: new V3(0, DECK + 3.1, 4.6), look: new V3(0, DECK + 1.0, -6) };
   const tmpA = new V3(), tmpB = new V3(), Y_AXIS = new V3(0, 1, 0);
 
+  // ---------- motion (subtle by design; stiller under Reduce Motion)
+  const reduceMotionQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  let motion = L.motionAmplitudes(!!(reduceMotionQuery && reduceMotionQuery.matches));
+  if (reduceMotionQuery && reduceMotionQuery.addEventListener) {
+    reduceMotionQuery.addEventListener('change', (e) => { motion = L.motionAmplitudes(e.matches); });
+  }
+
   // ---------- loop
   const clock = new T.Clock();
   let t = 0, yawVel = 0, frames = 0, slowFrames = 0, paused = false, rafId = 0;
@@ -817,16 +824,16 @@
     const [bx, bz] = wpt(0, -4.5), [sx, sz] = wpt(0, 4), [px, pz] = wpt(-2, 0), [qx, qz] = wpt(2, 0);
     const hB = waveHeight(bx, bz, t), hS = waveHeight(sx, sz, t), hP = waveHeight(px, pz, t), hQ = waveHeight(qx, qz, t);
     const sink = visuals.waterline * 0.9;
-    ship.position.y = lerp(ship.position.y, ((hB + hS + hP + hQ) / 4) * 0.7 - 0.05 - sink, 0.15);
-    ship.rotation.x = lerp(ship.rotation.x, Math.atan2(hB - hS, 8.5) * 0.6 - (visuals.sinking ? 0.08 : 0), 0.1);
-    ship.rotation.z = lerp(ship.rotation.z, Math.atan2(hQ - hP, 4) * 0.6 - clamp(yawVel * 0.5, -0.08, 0.08) + visuals.listDeg * D2R, 0.1);
+    ship.position.y = lerp(ship.position.y, ((hB + hS + hP + hQ) / 4) * motion.heave - 0.05 - sink, 0.15);
+    ship.rotation.x = lerp(ship.rotation.x, Math.atan2(hB - hS, 8.5) * motion.pitch - (visuals.sinking ? 0.08 : 0), 0.1);
+    ship.rotation.z = lerp(ship.rotation.z, Math.atan2(hQ - hP, 4) * motion.roll - clamp(yawVel * 0.5, -0.08, 0.08) + visuals.listDeg * D2R, 0.1);
 
-    const heave = ship.position.y * 0.8;
-    const camLocal = tmpA.set(camBase.pos.x, camBase.pos.y + heave + ship.rotation.x * 1.2, camBase.pos.z);
+    const heave = ship.position.y * motion.cameraHeave;
+    const camLocal = tmpA.set(camBase.pos.x, camBase.pos.y + heave + ship.rotation.x * motion.cameraPitch, camBase.pos.z);
     const lookLocal = tmpB.set(camBase.look.x, camBase.look.y + heave * 0.6, camBase.look.z);
     camera.position.copy(camLocal).applyAxisAngle(Y_AXIS, yaw);
     camera.lookAt(lookLocal.applyAxisAngle(Y_AXIS, yaw));
-    camera.rotateZ(-ship.rotation.z * 0.35);
+    camera.rotateZ(-ship.rotation.z * motion.cameraRoll);
     oceanUniforms.uCam.value.copy(camera.position);
     sky.position.copy(camera.position);
 
