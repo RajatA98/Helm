@@ -60,3 +60,10 @@
 ### Addendum to Entry 6 — 2026-09-12
 
 - **Verified on the newest simulator:** all 16 app tests pass on iPhone 17 Pro with iOS 26.2 (Xcode 26.2 runtime), and the app renders correctly there (screenshot: `docs/screenshots/phase1/sim-ios26-iphone17pro-leaks3-dusk.png`, 3 leaks at 19:12). The documented test destination is now `name=iPhone 17 Pro,OS=26.2`; the iOS 18.2 iPhone 16 Pro results above still hold. The deployment target stays iOS 18.0 so older phones remain supported.
+
+### Fix — 2026-09-12: undo a strike in the log
+
+- **Found by:** the user, testing Phase 1 on a phone: a task tapped by mistake could not be unmarked.
+- **Tests:** `testUnstrikeReopensAStruckTask`, `testUnstrikeWithUnknownIdChangesNothing` in HelmSessionTests (red first, then green).
+- **Files:** `HelmCore/Sources/HelmCore/HelmSession.swift` (`unstrike(taskID:)`), `Helm/Views/LogPlaceholderSheet.swift` (a done task is tappable again and reopens; VoiceOver label says "Tap to undo").
+- **Note:** PRD requirement 25 limits undo to before midnight; that boundary arrives with the rollover in Phase 2.

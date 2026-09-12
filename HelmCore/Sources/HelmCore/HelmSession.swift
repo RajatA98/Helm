@@ -114,9 +114,19 @@ public struct HelmSession: Equatable, Sendable {
     // MARK: Mutations
 
     public mutating func strike(taskID: String) {
+        setDone(true, taskID: taskID)
+    }
+
+    /// Reopens a struck task. The PRD allows undo until midnight; in Phase 1 there is no
+    /// rollover yet, so any struck sample task can be reopened.
+    public mutating func unstrike(taskID: String) {
+        setDone(false, taskID: taskID)
+    }
+
+    private mutating func setDone(_ done: Bool, taskID: String) {
         for g in goals.indices {
             if let t = goals[g].tasks.firstIndex(where: { $0.id == taskID }) {
-                goals[g].tasks[t].isDone = true
+                goals[g].tasks[t].isDone = done
                 return
             }
         }

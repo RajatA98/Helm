@@ -40,6 +40,24 @@ final class HelmSessionTests: XCTestCase {
         XCTAssertTrue(session.goals.flatMap(\.tasks).first { $0.id == first.id }!.isDone)
     }
 
+    func testUnstrikeReopensAStruckTask() {
+        var session = HelmSession.sample()
+        let first = try! XCTUnwrap(session.nextTask)
+        session.strike(taskID: first.id)
+        let afterStrike = session.tasksLeft
+        session.unstrike(taskID: first.id)
+        XCTAssertEqual(session.tasksLeft, afterStrike + 1)
+        XCTAssertEqual(session.nextTask?.id, first.id)
+        XCTAssertFalse(session.goals.flatMap(\.tasks).first { $0.id == first.id }!.isDone)
+    }
+
+    func testUnstrikeWithUnknownIdChangesNothing() {
+        var session = HelmSession.sample()
+        let before = session
+        session.unstrike(taskID: "nope")
+        XCTAssertEqual(session, before)
+    }
+
     func testStrikeWithUnknownIdChangesNothing() {
         var session = HelmSession.sample()
         let before = session

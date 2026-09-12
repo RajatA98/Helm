@@ -13,7 +13,11 @@ struct LogPlaceholderSheet: View {
                     Section {
                         ForEach(goal.tasks) { task in
                             Button {
-                                session.strike(taskID: task.id)
+                                if task.isDone {
+                                    session.unstrike(taskID: task.id)
+                                } else {
+                                    session.strike(taskID: task.id)
+                                }
                             } label: {
                                 HStack(spacing: 14) {
                                     Image(systemName: task.isDone ? "checkmark.circle.fill" : "circle")
@@ -31,8 +35,7 @@ struct LogPlaceholderSheet: View {
                                 }
                                 .frame(minHeight: 44)
                             }
-                            .disabled(task.isDone)
-                            .accessibilityLabel(task.isDone ? "\(task.title), done" : "Strike \(task.title)")
+                            .accessibilityLabel(task.isDone ? "\(task.title), done. Tap to undo" : "Strike \(task.title)")
                         }
                     } header: {
                         Text("\(goal.name), heading for \(goal.islandName)")
