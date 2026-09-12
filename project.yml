@@ -1,0 +1,68 @@
+name: Helm
+options:
+  bundleIdPrefix: com.rajatarora
+  deploymentTarget:
+    iOS: "18.0"
+  createIntermediateGroups: true
+  xcodeVersion: "26.2"
+
+packages:
+  HelmCore:
+    path: HelmCore
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+
+targets:
+  Helm:
+    type: application
+    platform: iOS
+    sources:
+      - path: Helm
+    dependencies:
+      - package: HelmCore
+    info:
+      path: Helm/Info.plist
+      properties:
+        CFBundleDisplayName: Helm
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.rajatarora.helm
+        ENABLE_PREVIEWS: YES
+        DEVELOPMENT_ASSET_PATHS: ""
+
+  HelmTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: HelmTests
+    dependencies:
+      - target: Helm
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.rajatarora.helm.tests
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  Helm:
+    build:
+      targets:
+        Helm: all
+        HelmTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - HelmTests
