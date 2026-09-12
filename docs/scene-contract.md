@@ -62,6 +62,7 @@ Posted as `window.webkit.messageHandlers.helm.postMessage(object)`. In a plain b
 | `crateTapped` | | Open the charts. |
 | `lighthouseTapped` | | Open the Cove. |
 | `islandTapped` | `id` (string, required) | The user tapped an island marker. |
+| `sceneError` | `message` (string) | Something went wrong inside the scene (WebGL unavailable, a bad state payload). Not yet a named event on the Swift side; it arrives as `.unknown(type: "sceneError")` and is logged. Follow-up: add it to `SceneEvent`. |
 
 Rules the app follows:
 

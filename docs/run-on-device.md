@@ -34,3 +34,13 @@ Phase 1 is verified in the iPhone simulator. Three acceptance criteria can only 
 - Long-press the clock to open the debug screen: the fps reading there should stay in the 50s or above.
 
 If the ship never appears and the calm fallback stays on screen, open the debug screen and read the bridge log; a load error or timeout is recorded there.
+
+## Starting the app in a chosen state (debug builds)
+
+For screenshots and quick checks, the simulator can launch Helm with overrides:
+
+```
+xcrun simctl launch booted com.rajatarora.helm -helmLeaks 4 -helmHours 19.5 -helmHeading hired
+```
+
+`-helmLeaks` sets the open-leak count (0 and up), `-helmHours` fixes the scene's time of day (0 to 23.9), `-helmHeading` picks the goal (`fit` or `hired` in the sample data). In Xcode, the same flags go under Product → Scheme → Edit Scheme → Run → Arguments. Release builds ignore them.
