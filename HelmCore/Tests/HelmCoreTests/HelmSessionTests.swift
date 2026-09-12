@@ -72,10 +72,74 @@ final class HelmSessionTests: XCTestCase {
         XCTAssertNil(session.nextTask)
     }
 
-    func testTurnWheelCyclesThroughGoalsAndBack() {
+    // MARK: Headings: every goal, then the Cove
+
+    func testHeadingsAreTheGoalsThenTheCove() {
+        let session = HelmSession.sample()
+        XCTAssertEqual(session.headings, ["fit", "hired", HelmSession.coveHeadingID])
+        XCTAssertFalse(session.isHeadingCove)
+    }
+
+    func testTurnWheelCyclesThroughGoalsAndTheCoveAndBack() {
         var session = HelmSession.sample()
-        session.turnWheel(); session.turnWheel()
+        session.turnWheel()
+        XCTAssertEqual(session.headingGoalID, "hired")
+        session.turnWheel()
+        XCTAssertEqual(session.headingGoalID, HelmSession.coveHeadingID)
+        session.turnWheel()
         XCTAssertEqual(session.headingGoalID, "fit")
+    }
+
+    func testTurnWheelPreviousWrapsBackwards() {
+        var session = HelmSession.sample()
+        session.turnWheel(direction: .previous)
+        XCTAssertEqual(session.headingGoalID, HelmSession.coveHeadingID)
+        session.turnWheel(direction: .previous)
+        XCTAssertEqual(session.headingGoalID, "hired")
+        session.turnWheel(direction: .previous)
+        XCTAssertEqual(session.headingGoalID, "fit")
+    }
+
+    func testTurnWheelWithThreeGoalsAndTheCove() {
+        var session = HelmSession.sample()
+        session.goals.append(HelmSession.Goal(id: "read", name: "Read More", islandName: "Twenty Pages", bearingDeg: -40,
+                                              crewName: "Tully, scholar", busyLine: "Pages, Captain.", doneLine: "Well read.",
+                                              tasks: [HelmSession.Task(id: "pages", goalID: "read", title: "Read 20 pages")]))
+        XCTAssertEqual(session.headings, ["fit", "hired", "read", "cove"])
+        for _ in 0..<4 { session.turnWheel(direction: .next) }
+        XCTAssertEqual(session.headingGoalID, "fit", "four steps forward returns to the start")
+        session.turnWheel(direction: .previous)
+        XCTAssertEqual(session.headingGoalID, "cove")
+        session.turnWheel(direction: .previous)
+        XCTAssertEqual(session.headingGoalID, "read")
+    }
+
+    func testSetHeadingAcceptsKnownIdsAndIgnoresOthers() {
+        var session = HelmSession.sample()
+        session.setHeading(id: HelmSession.coveHeadingID)
+        XCTAssertTrue(session.isHeadingCove)
+        session.setHeading(id: "nope")
+        XCTAssertTrue(session.isHeadingCove, "an unknown id changes nothing")
+        session.setHeading(id: "hired")
+        XCTAssertEqual(session.headingGoalID, "hired")
+    }
+
+    func testCoveHeadingShowsANeutralLineAndKeepsOfferingGoalTasks() {
+        var session = HelmSession.sample()
+        session.setHeading(id: HelmSession.coveHeadingID)
+        XCTAssertNil(session.currentGoal)
+        XCTAssertEqual(session.headingName, "The Cove")
+        XCTAssertEqual(session.crewLine, "Allies ahead, Captain.")
+        XCTAssertEqual(session.nextTask?.id, "legs", "the dock keeps offering the goals' tasks in order")
+        XCTAssertEqual(session.tasksLeft, 3)
+    }
+
+    func testSceneStateIncludesTheCoveAsATarget() {
+        let state = HelmSession.sample().sceneState(hours: 9)
+        XCTAssertEqual(state.islands.map(\.id), ["fit", "hired", "cove"])
+        let cove = try! XCTUnwrap(state.islands.last)
+        XCTAssertEqual(cove.name, "The Cove")
+        XCTAssertEqual(cove.bearingDeg, HelmSession.sample().coveBearingDeg)
     }
 
     func testOpenLeaksNeverGoesNegative() {
@@ -97,8 +161,8 @@ final class HelmSessionTests: XCTestCase {
         XCTAssertEqual(state.headingGoalID, "hired")
         XCTAssertEqual(state.timeOfDay, 9.5)
         XCTAssertEqual(state.timeOverride, 21)
-        XCTAssertEqual(state.islands.map(\.id), ["fit", "hired"])
-        XCTAssertEqual(state.crewName, session.currentGoal.crewName)
+        XCTAssertEqual(state.islands.map(\.id), ["fit", "hired", "cove"])
+        XCTAssertEqual(state.crewName, session.currentGoal?.crewName)
         XCTAssertFalse(state.crewLine.isEmpty)
     }
 

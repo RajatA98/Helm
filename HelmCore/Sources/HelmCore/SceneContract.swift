@@ -136,10 +136,15 @@ public struct SceneAnchor: Codable, Equatable, Sendable {
     }
 }
 
+/// Which way the wheel was turned. A tap counts as `next`.
+public enum TurnDirection: String, Codable, Equatable, Sendable {
+    case next, previous
+}
+
 public enum SceneEvent: Equatable, Sendable {
     case sceneReady
     case sceneStats(fps: Double, loadMs: Double)
-    case wheelTurned
+    case wheelTurned(direction: TurnDirection)
     case barrelTapped
     case crateTapped
     case lighthouseTapped
@@ -166,7 +171,7 @@ public struct SceneEventEnvelope: Equatable, Sendable {
         version = raw.version
         switch raw.type {
         case "sceneReady": event = .sceneReady
-        case "wheelTurned": event = .wheelTurned
+        case "wheelTurned": event = .wheelTurned(direction: TurnDirection(rawValue: raw.direction ?? "") ?? .next)
         case "barrelTapped": event = .barrelTapped
         case "crateTapped": event = .crateTapped
         case "lighthouseTapped": event = .lighthouseTapped
@@ -192,10 +197,11 @@ public struct SceneEventEnvelope: Equatable, Sendable {
     }
 
     private struct RawEvent: Decodable {
-        enum CodingKeys: String, CodingKey { case version, type, id, fps, loadMs, points }
+        enum CodingKeys: String, CodingKey { case version, type, id, direction, fps, loadMs, points }
         let version: Int
         let type: String
         let id: String?
+        let direction: String?
         let fps: Double?
         let loadMs: Double?
         let points: [String: RawPoint]?

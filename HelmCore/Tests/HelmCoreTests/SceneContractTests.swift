@@ -66,7 +66,10 @@ final class SceneContractTests: XCTestCase {
     func testDecodesEveryKnownEventType() throws {
         let cases: [(String, SceneEvent)] = [
             (#"{"version":1,"type":"sceneReady"}"#, .sceneReady),
-            (#"{"version":1,"type":"wheelTurned"}"#, .wheelTurned),
+            (#"{"version":1,"type":"wheelTurned"}"#, .wheelTurned(direction: .next)),
+            (#"{"version":1,"type":"wheelTurned","direction":"next"}"#, .wheelTurned(direction: .next)),
+            (#"{"version":1,"type":"wheelTurned","direction":"previous"}"#, .wheelTurned(direction: .previous)),
+            (#"{"version":1,"type":"wheelTurned","direction":"sideways"}"#, .wheelTurned(direction: .next)),
             (#"{"version":1,"type":"barrelTapped"}"#, .barrelTapped),
             (#"{"version":1,"type":"crateTapped"}"#, .crateTapped),
             (#"{"version":1,"type":"lighthouseTapped"}"#, .lighthouseTapped),

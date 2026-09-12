@@ -603,6 +603,11 @@
   function syncIslands(state) {
     const seen = new Set();
     state.islands.forEach((island, index) => {
+      if (island.id === L.COVE_ID) {
+        // The Cove is the lighthouse landmark, already built; the state only says where it lies.
+        const b = island.bearingDeg * D2R; cove.position.set(Math.sin(b) * 118, 0, -Math.cos(b) * 118);
+        return;
+      }
       seen.add(island.id);
       let g = islandMeshes.get(island.id);
       if (!g) { g = buildIsland(island, index); islandMeshes.set(island.id, g); }
@@ -766,20 +771,48 @@
     for (const [id, g] of islandMeshes) list.push({ root: g, act: () => post('islandTapped', { id }) });
     return list;
   }
-  function standaloneTurn() {
+  function standaloneTurn(direction) {
     const ids = state.islands.map((i) => i.id); if (ids.length < 2) return;
-    const next = ids[(ids.indexOf(state.headingGoalID) + 1) % ids.length];
+    const step = direction === 'previous' ? ids.length - 1 : 1;
+    const next = ids[(ids.indexOf(state.headingGoalID) + step) % ids.length];
     applyState(L.normalizeState(Object.assign({}, state, { headingGoalID: next })));
   }
-  let downAt = null;
-  canvas.addEventListener('pointerdown', (e) => { downAt = { x: e.clientX, y: e.clientY }; });
-  canvas.addEventListener('pointerup', (e) => {
-    if (!downAt || Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) > 8) return;
+  // A tap picks an object. A horizontal drag that starts on the wheel turns it with the finger and,
+  // past a threshold, steps the heading (left: next, right: previous). The app decides the new heading.
+  let downAt = null, drag = null, wheelReturn = null;
+  function setNdc(e) {
     const r = canvas.getBoundingClientRect();
     ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
     ray.setFromCamera(ndc, camera);
+  }
+  function tap(e) {
+    setNdc(e);
     for (const p of pickables()) { if (ray.intersectObject(p.root, true).length) { p.act(); return; } }
+  }
+  function springWheelBack() {
+    if (drag && !drag.stepped && !turn) wheelReturn = { from: wheel.rotation.z, to: drag.rot0, t0: performance.now() };
+  }
+  canvas.addEventListener('pointerdown', (e) => {
+    downAt = { x: e.clientX, y: e.clientY };
+    setNdc(e);
+    drag = ray.intersectObject(wheel, true).length ? { x0: e.clientX, rot0: wheel.rotation.z, stepped: false } : null;
+    if (drag) { wheelReturn = null; try { canvas.setPointerCapture(e.pointerId); } catch (_) { /* not supported */ } }
   });
+  canvas.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x0;
+    if (!turn) wheel.rotation.z = drag.rot0 + dx * L.WHEEL_DRAG_RAD_PER_PX;
+    if (!drag.stepped) {
+      const dir = L.wheelDragStep(dx);
+      if (dir) { drag.stepped = true; post('wheelTurned', { direction: dir }); if (standalone) standaloneTurn(dir); }
+    }
+  });
+  canvas.addEventListener('pointerup', (e) => {
+    const moved = downAt ? Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) : Infinity;
+    if (moved <= 8) tap(e); else springWheelBack();
+    drag = null; downAt = null;
+  });
+  canvas.addEventListener('pointercancel', () => { springWheelBack(); drag = null; downAt = null; });
 
   // ---------- size
   let vw = 1, vh = 1;
@@ -804,7 +837,6 @@
     crate: new V3(1.25, DECK + 0.78, -1.35),
     wheel: new V3(0, WHEEL_Y, WHEEL_Z),
   };
-  const lighthouseWorld = new V3(-2, 21.5, 0).add(cove.position);
   const anchorTmp = new V3();
   let lastAnchors = null, lastAnchorsAt = 0;
   function updateAnchors(yaw, nowMs) {
@@ -823,7 +855,7 @@
       anchorTmp.copy(ANCHOR_LOCAL[name]); stillShip.localToWorld(anchorTmp); anchorTmp.project(stillCamera);
       projected[name] = { x: anchorTmp.x, y: anchorTmp.y, z: anchorTmp.z };
     }
-    anchorTmp.copy(lighthouseWorld).project(stillCamera);
+    anchorTmp.set(-2, 21.5, 0).add(cove.position).project(stillCamera);
     projected.lighthouse = { x: anchorTmp.x, y: anchorTmp.y, z: anchorTmp.z };
     const msg = L.buildAnchorsMessage(projected, { width: vw, height: vh });
     const key = JSON.stringify(msg.points);
@@ -858,6 +890,10 @@
       wheel.rotation.z = lerp(turn.wFrom, turn.wTo, easeInOut(clamp(k * 1.4, 0, 1)));
       avParts.head.rotation.y = Math.sin(k * Math.PI) * -Math.sign(turn.to - turn.from) * 0.3;
       if (k >= 1) turn = null;
+    } else if (wheelReturn) {
+      const k = clamp((nowMs - wheelReturn.t0) / 280, 0, 1);
+      wheel.rotation.z = lerp(wheelReturn.from, wheelReturn.to, easeInOut(k));
+      if (k >= 1) wheelReturn = null;
     }
     yawVel = lerp(yawVel, (yawGroup.rotation.y - prevYaw) / Math.max(dt, 1e-3), 0.1);
 

@@ -9,7 +9,7 @@ struct HelmScreen: View {
         let o = LaunchOverrides.current
         if let leaks = o.openLeaks { s.setOpenLeaks(leaks) }
         if let hours = o.hours { s.timeOverride = hours }
-        if let heading = o.headingGoalID, s.goals.contains(where: { $0.id == heading }) { s.headingGoalID = heading }
+        if let heading = o.headingGoalID { s.setHeading(id: heading) }
         return s
     }()
     @State private var now = Date()
@@ -33,11 +33,14 @@ struct HelmScreen: View {
             AnchorPillsOverlay(anchors: bridge.anchors, tasksLeft: session.tasksLeft,
                                onLog: { showLog = true },
                                onCharts: { show("The charts unroll in Phase 3.") },
-                               onCove: { show("The Cove opens in Phase 6.") })
+                               onCove: goToCove)
 
             VStack(spacing: 0) {
-                HelmHUD(now: now, openLeaks: session.openLeaks, goal: session.currentGoal,
+                HelmHUD(now: now, openLeaks: session.openLeaks,
+                        headingName: session.headingName, headingDetail: session.headingDetail,
                         onLongPressClock: { showDebug = true })
+                HeadingStrip(entries: headingEntries, currentID: session.headingGoalID, onSelect: select)
+                    .padding(.top, 8)
                 Spacer()
                 TodayDock(tasksLeft: session.tasksLeft, next: session.nextTask, goalName: goalName(for: session.nextTask),
                           onOpenLog: { showLog = true }, onStrike: strike)
@@ -98,19 +101,35 @@ struct HelmScreen: View {
 
     private func handle(_ event: SceneEvent) {
         switch event {
-        case .wheelTurned:
-            session.turnWheel()
+        case let .wheelTurned(direction):
+            session.turnWheel(direction: direction)
         case .barrelTapped:
             showLog = true
         case .crateTapped:
             show("The charts unroll in Phase 3.")
         case .lighthouseTapped:
-            show("The Cove opens in Phase 6.")
+            goToCove()
         case let .islandTapped(id):
-            if id == session.headingGoalID { showLog = true } else { session.headingGoalID = id }
+            select(id)
         case .sceneReady, .sceneStats, .anchors, .unknown:
             break
         }
+    }
+
+    /// Every heading for the strip: each goal, then the Cove.
+    private var headingEntries: [HeadingEntry] {
+        session.goals.map { HeadingEntry(id: $0.id, name: $0.name) }
+            + [HeadingEntry(id: HelmSession.coveHeadingID, name: HelmSession.coveName)]
+    }
+
+    /// Turn toward a heading. Already there: a goal opens the log, the Cove opens the Cove.
+    private func select(_ id: String) {
+        guard id == session.headingGoalID else { session.setHeading(id: id); return }
+        if session.isHeadingCove { show("The Cove opens in Phase 6.") } else { showLog = true }
+    }
+
+    private func goToCove() {
+        select(HelmSession.coveHeadingID)
     }
 
     private func show(_ message: String) {

@@ -39,7 +39,7 @@ Called as `window.helmScene.setState(json)` with one JSON string. Keys are alway
 | `headingGoalID` | Which island the ship is steering toward. Must match an `islands[].id`. |
 | `timeOfDay` | Local time as hours (`14.25` is 2:15 pm). Drives the sky, light and lanterns. |
 | `timeOverride` | Optional. When present, the scene draws this hour instead. Omitted when not set. |
-| `islands` | Every goal as an island: id, name of the current island, goal name, and a compass bearing in degrees (0 is straight ahead). |
+| `islands` | Every goal as an island: id, name of the current island, goal name, and a compass bearing in degrees (0 is straight ahead). The app also appends the Cove as `{ "id": "cove", "name": "The Cove", "goalName": "Allies", "bearingDeg": -16 }`: the scene doesn't build an island for it, it places the lighthouse at that bearing, and `headingGoalID: "cove"` turns the ship to face it. |
 | `crewName`, `crewLine` | The crewmate on deck and their current line. The scene may show a speech bubble; the app owns the text. |
 | `avatar` | Colors as CSS hex, styles as short ids. Applied to the captain at the wheel. |
 | `shipDesign` | Hull and sail colors (hex) and a flag emblem id. Applied to the ship's materials. |
@@ -57,7 +57,7 @@ Posted as `window.webkit.messageHandlers.helm.postMessage(object)`. In a plain b
 |---|---|---|
 | `sceneReady` | | The scene has mounted and rendered its first frame. |
 | `sceneStats` | `fps` (number), `loadMs` (number) | About every 2 seconds. `loadMs` is time from script start to first frame. |
-| `wheelTurned` | | The user tapped the wheel. The app decides the new heading and sends a new state. |
+| `wheelTurned` | `direction` (`"next"` or `"previous"`, always present) | The user turned the wheel. A tap, or a drag to the left past 60 px, sends `next`; a drag to the right sends `previous`. The app decides the new heading (goals in order, then the Cove, wrapping around) and sends a new state; the scene animates to it. |
 | `barrelTapped` | | Open the log. |
 | `crateTapped` | | Open the charts. |
 | `lighthouseTapped` | | Open the Cove. |

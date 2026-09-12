@@ -114,8 +114,30 @@ test('solar azimuth moves from behind the ship at sunrise toward the bow by suns
   assert.ok(evening > morning);
 });
 
+test('a wheel drag steps the heading once it passes the threshold', () => {
+  assert.equal(L.WHEEL_DRAG_THRESHOLD, 60);
+  assert.equal(L.wheelDragStep(-20), null);
+  assert.equal(L.wheelDragStep(20), null);
+  assert.equal(L.wheelDragStep(-60), 'next', 'drag left: next heading');
+  assert.equal(L.wheelDragStep(75), 'previous', 'drag right: previous heading');
+  assert.equal(L.wheelDragStep(-100, 120), null, 'a custom threshold is respected');
+  assert.ok(L.WHEEL_DRAG_RAD_PER_PX > 0);
+});
+
+test('wheelTurned always carries a direction and rejects a bad one', () => {
+  assert.deepEqual(L.buildEvent('wheelTurned'), { version: 1, type: 'wheelTurned', direction: 'next' });
+  assert.deepEqual(L.buildEvent('wheelTurned', { direction: 'previous' }), { version: 1, type: 'wheelTurned', direction: 'previous' });
+  assert.throws(() => L.buildEvent('wheelTurned', { direction: 'sideways' }), /direction/);
+});
+
+test('the cove is a heading target the ship can face, not an island to build', () => {
+  const s = L.normalizeState({ ...baseState(), headingGoalID: 'cove', islands: [...baseState().islands, { id: 'cove', name: 'The Cove', goalName: 'Allies', bearingDeg: -16 }] });
+  assert.equal(L.headingBearing(s), -16);
+  assert.equal(L.COVE_ID, 'cove');
+  assert.deepEqual(s.islands.filter((i) => i.id !== L.COVE_ID).map((i) => i.id), ['fit', 'hired']);
+});
+
 test('buildEvent stamps the version and carries extra fields', () => {
-  assert.deepEqual(L.buildEvent('wheelTurned'), { version: 1, type: 'wheelTurned' });
   assert.deepEqual(L.buildEvent('islandTapped', { id: 'hired' }), { version: 1, type: 'islandTapped', id: 'hired' });
   assert.deepEqual(L.buildEvent('sceneStats', { fps: 59.4, loadMs: 800 }), { version: 1, type: 'sceneStats', fps: 59.4, loadMs: 800 });
 });

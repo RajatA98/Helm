@@ -63,7 +63,7 @@ final class SceneBridgeTests: XCTestCase {
         bridge.onEvent = { received.append($0) }
         bridge.receive(body: ["version": 1, "type": "wheelTurned"])
         bridge.receive(body: ["version": 1, "type": "islandTapped", "id": "hired"])
-        XCTAssertEqual(received, [.wheelTurned, .islandTapped(id: "hired")])
+        XCTAssertEqual(received, [.wheelTurned(direction: .next), .islandTapped(id: "hired")])
     }
 
     func testUnknownEventTypeIsLoggedAndForwardedAsUnknown() {

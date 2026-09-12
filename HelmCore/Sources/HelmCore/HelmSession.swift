@@ -43,21 +43,30 @@ public struct HelmSession: Equatable, Sendable {
         }
     }
 
+    /// The Cove is a heading like any goal: the last stop when turning the wheel.
+    public static let coveHeadingID = "cove"
+    public static let coveName = "The Cove"
+    public static let coveLine = "Allies ahead, Captain."
+
     public var goals: [Goal]
+    /// The current heading: a goal id, or `coveHeadingID`.
     public var headingGoalID: String
     public private(set) var openLeaks: Int
     public var timeOverride: Double?
     public var avatar: AvatarOptions
     public var shipDesign: ShipDesign
+    /// Where the Cove lies, as a compass bearing from the home heading.
+    public var coveBearingDeg: Double
 
     public init(goals: [Goal], headingGoalID: String, openLeaks: Int, timeOverride: Double? = nil,
-                avatar: AvatarOptions, shipDesign: ShipDesign) {
+                avatar: AvatarOptions, shipDesign: ShipDesign, coveBearingDeg: Double = -16) {
         self.goals = goals
         self.headingGoalID = headingGoalID
         self.openLeaks = max(0, openLeaks)
         self.timeOverride = timeOverride
         self.avatar = avatar
         self.shipDesign = shipDesign
+        self.coveBearingDeg = coveBearingDeg
     }
 
     // MARK: Sample data
@@ -92,8 +101,27 @@ public struct HelmSession: Equatable, Sendable {
 
     // MARK: Derived
 
-    public var currentGoal: Goal {
-        goals.first { $0.id == headingGoalID } ?? goals[0]
+    /// Every heading the wheel turns through: each goal in order, then the Cove.
+    public var headings: [String] {
+        goals.map(\.id) + [Self.coveHeadingID]
+    }
+
+    public var isHeadingCove: Bool {
+        headingGoalID == Self.coveHeadingID
+    }
+
+    /// The goal being steered toward, or nil when the heading is the Cove.
+    public var currentGoal: Goal? {
+        goals.first { $0.id == headingGoalID }
+    }
+
+    /// What the HUD shows as the destination: the island ahead, or The Cove.
+    public var headingName: String {
+        isHeadingCove ? Self.coveName : (currentGoal?.islandName ?? goals.first?.islandName ?? "")
+    }
+
+    public var headingDetail: String {
+        isHeadingCove ? "Allies" : (currentGoal?.name ?? "")
     }
 
     public var tasksLeft: Int {
@@ -101,13 +129,18 @@ public struct HelmSession: Equatable, Sendable {
     }
 
     /// The task the Today dock offers: the current goal's first open task, then the other goals' in order.
+    /// When heading for the Cove there is no current goal, so the goals are offered in order.
     public var nextTask: Task? {
-        let ordered = [currentGoal] + goals.filter { $0.id != headingGoalID }
+        let ordered = currentGoal.map { [$0] + goals.filter { $0.id != headingGoalID } } ?? goals
         return ordered.lazy.flatMap(\.tasks).first { !$0.isDone }
     }
 
+    public var crewName: String {
+        currentGoal?.crewName ?? ""
+    }
+
     public var crewLine: String {
-        let goal = currentGoal
+        guard let goal = currentGoal else { return Self.coveLine }
         return goal.tasks.contains { !$0.isDone } ? goal.busyLine : goal.doneLine
     }
 
@@ -132,9 +165,17 @@ public struct HelmSession: Equatable, Sendable {
         }
     }
 
-    public mutating func turnWheel() {
-        guard let i = goals.firstIndex(where: { $0.id == headingGoalID }) else { return }
-        headingGoalID = goals[(i + 1) % goals.count].id
+    /// Steps to the next (or previous) heading, wrapping around: goals in order, then the Cove.
+    public mutating func turnWheel(direction: TurnDirection = .next) {
+        let all = headings
+        guard let i = all.firstIndex(of: headingGoalID) else { headingGoalID = all[0]; return }
+        let step = direction == .next ? 1 : all.count - 1
+        headingGoalID = all[(i + step) % all.count]
+    }
+
+    /// Turns straight to a heading. Unknown ids are ignored.
+    public mutating func setHeading(id: String) {
+        if headings.contains(id) { headingGoalID = id }
     }
 
     public mutating func setOpenLeaks(_ n: Int) {
@@ -149,8 +190,9 @@ public struct HelmSession: Equatable, Sendable {
             headingGoalID: headingGoalID,
             timeOfDay: hours,
             timeOverride: timeOverride,
-            islands: goals.map { Island(id: $0.id, name: $0.islandName, goalName: $0.name, bearingDeg: $0.bearingDeg) },
-            crewName: currentGoal.crewName,
+            islands: goals.map { Island(id: $0.id, name: $0.islandName, goalName: $0.name, bearingDeg: $0.bearingDeg) }
+                + [Island(id: Self.coveHeadingID, name: Self.coveName, goalName: "Allies", bearingDeg: coveBearingDeg)],
+            crewName: crewName,
             crewLine: crewLine,
             avatar: avatar,
             shipDesign: shipDesign)

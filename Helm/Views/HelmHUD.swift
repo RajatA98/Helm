@@ -5,7 +5,10 @@ import HelmCore
 struct HelmHUD: View {
     let now: Date
     let openLeaks: Int
-    let goal: HelmSession.Goal
+    /// The island ahead, or "The Cove".
+    let headingName: String
+    /// The goal's name, or "Allies" for the Cove.
+    let headingDetail: String
     let onLongPressClock: () -> Void
 
     var body: some View {
@@ -29,7 +32,7 @@ struct HelmHUD: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 2) {
-                Text(goal.islandName)
+                Text(headingName)
                     .font(.headline)
                     .lineLimit(1)
                 Text(leakLabel)
@@ -39,7 +42,7 @@ struct HelmHUD: View {
             .padding(.horizontal, 12).padding(.vertical, 8)
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("Heading for \(goal.islandName), \(goal.name). \(leakLabel).")
+            .accessibilityLabel("Heading for \(headingName), \(headingDetail). \(leakLabel).")
         }
         .frame(minHeight: 44)
     }

@@ -97,12 +97,31 @@
     return { el, az: 194 + 180 * frac };
   }
 
+  /** The Cove rides in `islands` as a heading target with this id; the scene draws it as the lighthouse. */
+  const COVE_ID = 'cove';
+
+  /** Dragging the wheel: how far (CSS px) before the heading steps, and how much the wheel turns per px. */
+  const WHEEL_DRAG_THRESHOLD = 60;
+  const WHEEL_DRAG_RAD_PER_PX = 0.012;
+  /** Drag left steps to the next heading, drag right to the previous one; less than the threshold does nothing. */
+  function wheelDragStep(dx, threshold) {
+    const t = threshold == null ? WHEEL_DRAG_THRESHOLD : threshold;
+    if (dx <= -t) return 'next';
+    if (dx >= t) return 'previous';
+    return null;
+  }
+
   /** A message for the app. Always stamped with the contract version. */
   function buildEvent(type, extra) {
     if (type === 'islandTapped' && !(extra && typeof extra.id === 'string')) {
       throw new Error('islandTapped requires an id');
     }
-    return Object.assign({ version: VERSION, type }, extra || {});
+    const msg = Object.assign({ version: VERSION, type }, extra || {});
+    if (type === 'wheelTurned') {
+      if (msg.direction == null) msg.direction = 'next';
+      if (msg.direction !== 'next' && msg.direction !== 'previous') throw new Error('wheelTurned direction must be next or previous');
+    }
+    return msg;
   }
 
   /**
@@ -181,5 +200,6 @@
     VERSION, conditionFor, normalizeState, effectiveHours, conditionVisuals,
     headingBearing, solar, buildEvent, parseHexColor, MOCK_STATE, DEFAULT_AVATAR, DEFAULT_SHIP,
     MOTION_SCALE, BASE_MOTION, motionAmplitudes, buildAnchorsMessage,
+    COVE_ID, WHEEL_DRAG_THRESHOLD, WHEEL_DRAG_RAD_PER_PX, wheelDragStep,
   };
 });
