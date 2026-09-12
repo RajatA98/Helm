@@ -1,0 +1,8 @@
+{
+  "name": "helm-scene",
+  "private": true,
+  "description": "Tests for the Helm ship scene's pure logic. The scene itself is bundled into the iOS app from Scene/.",
+  "scripts": {
+    "test": "node --test SceneTests/*.test.js"
+  }
+}

@@ -1,0 +1,137 @@
+// Pure logic for the ship scene. No DOM, no Three.js, so it runs under `node --test`.
+// The contract it implements is documented in docs/scene-contract.md and mirrored in
+// HelmCore/Sources/HelmCore/SceneContract.swift.
+(function (root, factory) {
+  const api = factory();
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  root.HelmSceneLogic = api;
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  const VERSION = 1;
+  const D2R = Math.PI / 180;
+
+  const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+
+  const DEFAULT_AVATAR = Object.freeze({
+    skinColor: '#b07a55', hairColor: '#17110d', hairStyle: 'short',
+    headwear: 'bandana', headwearColor: '#23958a', coat: 'long', coatColor: '#1b2842',
+  });
+  const DEFAULT_SHIP = Object.freeze({ hullColor: '#8c6a46', sailColor: '#d9d0bd', flagEmblem: 'anchor' });
+
+  /** Ship condition from open leaks. Mirrors ShipCondition(openLeaks:) in Swift. */
+  function conditionFor(openLeaks) {
+    const n = Math.max(0, openLeaks | 0);
+    if (n === 0) return 'clean';
+    if (n <= 2) return 'puddles';
+    if (n <= 4) return 'listing';
+    return 'sinking';
+  }
+
+  function str(v, fallback) { return typeof v === 'string' ? v : fallback; }
+  function num(v, fallback) { const n = Number(v); return Number.isFinite(n) ? n : fallback; }
+
+  /** Validates a state from the app (object or JSON string), fills defaults, derives the condition. */
+  function normalizeState(input) {
+    const raw = typeof input === 'string' ? JSON.parse(input) : input;
+    if (!raw || raw.version !== VERSION) {
+      throw new Error(`scene contract version mismatch: expected ${VERSION}, got ${raw && raw.version}`);
+    }
+    const openLeaks = Math.max(0, Math.floor(num(raw.openLeaks, 0)));
+    const avatar = Object.assign({}, DEFAULT_AVATAR, raw.avatar || {});
+    const shipDesign = Object.assign({}, DEFAULT_SHIP, raw.shipDesign || {});
+    const islands = Array.isArray(raw.islands)
+      ? raw.islands.filter((i) => i && typeof i.id === 'string').map((i) => ({
+          id: i.id,
+          name: str(i.name, ''),
+          goalName: str(i.goalName, ''),
+          bearingDeg: num(i.bearingDeg, 0),
+        }))
+      : [];
+    return {
+      version: VERSION,
+      openLeaks,
+      shipCondition: conditionFor(openLeaks),
+      headingGoalID: str(raw.headingGoalID, islands.length ? islands[0].id : ''),
+      timeOfDay: clamp(num(raw.timeOfDay, 12), 0, 23.999),
+      timeOverride: raw.timeOverride == null ? null : clamp(num(raw.timeOverride, 12), 0, 23.999),
+      islands,
+      crewName: str(raw.crewName, ''),
+      crewLine: str(raw.crewLine, ''),
+      avatar,
+      shipDesign,
+    };
+  }
+
+  function effectiveHours(state) {
+    return state.timeOverride == null ? state.timeOfDay : state.timeOverride;
+  }
+
+  /** What the ship should look like for a condition. Numbers the scene can use directly. */
+  function conditionVisuals(condition) {
+    switch (condition) {
+      case 'puddles': return { puddles: 2, listDeg: 0, sinking: false, waterline: 0 };
+      case 'listing': return { puddles: 4, listDeg: 7, sinking: false, waterline: 0.35 };
+      case 'sinking': return { puddles: 4, listDeg: 12, sinking: true, waterline: 1 };
+      default: return { puddles: 0, listDeg: 0, sinking: false, waterline: 0 };
+    }
+  }
+
+  function headingBearing(state) {
+    const island = state.islands.find((i) => i.id === state.headingGoalID);
+    return island ? island.bearingDeg : 0;
+  }
+
+  /**
+   * Sun position for a local hour. Elevation in degrees (negative below the horizon) and
+   * an azimuth in degrees relative to the ship: behind the ship at sunrise, over the port
+   * rail at noon, just off the bow by sunset. Latitude 38° is a reasonable mid-latitude default.
+   */
+  function solar(hours, dayOfYear, noonHour, latDeg) {
+    const lat = (latDeg == null ? 38 : latDeg) * D2R;
+    const decl = 23.44 * Math.sin((2 * Math.PI * (dayOfYear - 81)) / 365) * D2R;
+    const ha = (hours - noonHour) * 15 * D2R;
+    const el = Math.asin(Math.sin(lat) * Math.sin(decl) + Math.cos(lat) * Math.cos(decl) * Math.cos(ha)) / D2R;
+    const dayLen = (24 / Math.PI) * Math.acos(clamp(-Math.tan(lat) * Math.tan(decl), -1, 1));
+    const frac = (hours - (noonHour - dayLen / 2)) / dayLen;
+    return { el, az: 194 + 180 * frac };
+  }
+
+  /** A message for the app. Always stamped with the contract version. */
+  function buildEvent(type, extra) {
+    if (type === 'islandTapped' && !(extra && typeof extra.id === 'string')) {
+      throw new Error('islandTapped requires an id');
+    }
+    return Object.assign({ version: VERSION, type }, extra || {});
+  }
+
+  function parseHexColor(hex) {
+    if (typeof hex !== 'string') return null;
+    const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(hex.trim());
+    if (!m) return null;
+    let h = m[1];
+    if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+    return parseInt(h, 16);
+  }
+
+  /** The state the scene shows before the app sends one, and in a plain browser. */
+  const MOCK_STATE = Object.freeze({
+    version: VERSION,
+    openLeaks: 2,
+    headingGoalID: 'fit',
+    timeOfDay: 14.25,
+    islands: [
+      { id: 'fit', name: 'Heal the Shoulders', goalName: 'Get Fit', bearingDeg: 0 },
+      { id: 'hired', name: 'Ship the Portfolio', goalName: 'Get Hired', bearingDeg: 30 },
+    ],
+    crewName: 'Bran, master-at-arms',
+    crewLine: 'Legs before sundown, Captain.',
+    avatar: DEFAULT_AVATAR,
+    shipDesign: DEFAULT_SHIP,
+  });
+
+  return {
+    VERSION, conditionFor, normalizeState, effectiveHours, conditionVisuals,
+    headingBearing, solar, buildEvent, parseHexColor, MOCK_STATE, DEFAULT_AVATAR, DEFAULT_SHIP,
+  };
+});
