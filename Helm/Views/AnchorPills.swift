@@ -30,23 +30,29 @@ struct AnchorPillsOverlay: View {
     let onCove: () -> Void
 
     static let pillSize = CGSize(width: 104, height: 40)
+    /// The HUD and heading strip at the top, the Today dock at the bottom: pills stay out of those bands.
+    static let reservedTop: CGFloat = 112
+    static let reservedBottom: CGFloat = 88
 
     var body: some View {
+        // This overlay lives inside the safe area, so the reader reports the real insets. The scene's
+        // anchors are full-screen points, so each is shifted by those insets before placement.
         GeometryReader { geo in
+            let inset = geo.safeAreaInsets
             let bounds = CGRect(origin: .zero, size: geo.size)
-            let safe = geo.safeAreaInsets
+            let reserved = EdgeInsets(top: Self.reservedTop, leading: 0, bottom: Self.reservedBottom, trailing: 0)
             ZStack {
-                if let p = anchors["barrel"], let c = AnchorPillLayout.center(for: p, pillSize: Self.pillSize, bounds: bounds, safe: safe) {
+                if let p = anchors["barrel"], let c = AnchorPillLayout.center(for: Self.local(p, inset), pillSize: Self.pillSize, bounds: bounds, safe: reserved) {
                     AnchorPill(title: "Log", badge: tasksLeft > 0 ? "\(tasksLeft)" : "Done", action: onLog)
                         .accessibilityLabel(tasksLeft > 0 ? "Open today's log, \(tasksLeft) left" : "Open today's log, everything done")
                         .position(c)
                 }
-                if let p = anchors["crate"], let c = AnchorPillLayout.center(for: p, pillSize: Self.pillSize, bounds: bounds, safe: safe) {
+                if let p = anchors["crate"], let c = AnchorPillLayout.center(for: Self.local(p, inset), pillSize: Self.pillSize, bounds: bounds, safe: reserved) {
                     AnchorPill(title: "Charts", badge: nil, action: onCharts)
                         .accessibilityLabel("Open the charts")
                         .position(c)
                 }
-                if let p = anchors["lighthouse"], let c = AnchorPillLayout.center(for: p, pillSize: Self.pillSize, bounds: bounds, safe: safe) {
+                if let p = anchors["lighthouse"], let c = AnchorPillLayout.center(for: Self.local(p, inset), pillSize: Self.pillSize, bounds: bounds, safe: reserved) {
                     AnchorPill(title: "Cove", badge: nil, action: onCove)
                         .accessibilityLabel("Open the Cove")
                         .position(c)
@@ -54,7 +60,11 @@ struct AnchorPillsOverlay: View {
             }
             .animation(.easeOut(duration: 0.12), value: anchors)
         }
-        .ignoresSafeArea()
+    }
+
+    /// A full-screen anchor expressed in this overlay's safe-area coordinates.
+    static func local(_ p: SceneAnchor, _ inset: EdgeInsets) -> SceneAnchor {
+        SceneAnchor(x: p.x - inset.leading, y: p.y - inset.top, visible: p.visible)
     }
 }
 
