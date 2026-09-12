@@ -62,6 +62,7 @@ Posted as `window.webkit.messageHandlers.helm.postMessage(object)`. In a plain b
 | `crateTapped` | | Open the charts. |
 | `lighthouseTapped` | | Open the Cove. |
 | `islandTapped` | `id` (string, required) | The user tapped an island marker. |
+| `anchors` | `points` (object): `barrel`, `crate`, `lighthouse`, `wheel`, each `{ x, y, visible }` | Where those objects are on screen, in CSS px from the top-left of the web view (the app lays the web view out 1:1 with its own points, so no conversion). `visible` is false when the object is behind the camera or off screen. Projected from the ship's rest pose, so the points don't jitter with the waves; sent only when they move, at most ten times a second (so at least twice a second during a turn). A point missing `x` or `y` is dropped by the app; a missing `points` reads as an empty set. The app uses them to float the Log, Charts and Cove pills above the objects. |
 | `sceneError` | `message` (string) | Something went wrong inside the scene (WebGL unavailable, a bad state payload). Not yet a named event on the Swift side; it arrives as `.unknown(type: "sceneError")` and is logged. Follow-up: add it to `SceneEvent`. |
 
 Rules the app follows:

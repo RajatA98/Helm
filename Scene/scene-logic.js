@@ -128,6 +128,30 @@
     };
   }
 
+  /**
+   * Screen positions for the objects the native app anchors buttons to. Input: normalized
+   * device coordinates from camera projection ({x, y} in -1..1, z < 1 means in front of the
+   * camera) per named anchor, plus the viewport in CSS px. Output: an `anchors` event with
+   * CSS-pixel points and a visibility flag. Junk entries are dropped, never fatal.
+   */
+  function buildAnchorsMessage(projected, viewport) {
+    const w = num(viewport && viewport.width, 0), h = num(viewport && viewport.height, 0);
+    const points = {};
+    for (const name of Object.keys(projected || {})) {
+      const p = projected[name];
+      if (!p || typeof p !== 'object') continue;
+      const nx = Number(p.x), ny = Number(p.y), nz = Number(p.z);
+      if (![nx, ny, nz].every(Number.isFinite)) continue;
+      const visible = nz < 1 && nx >= -1.02 && nx <= 1.02 && ny >= -1.02 && ny <= 1.02;
+      points[name] = {
+        x: Math.round((nx * 0.5 + 0.5) * w * 10) / 10,
+        y: Math.round((-ny * 0.5 + 0.5) * h * 10) / 10,
+        visible,
+      };
+    }
+    return buildEvent('anchors', { points });
+  }
+
   function parseHexColor(hex) {
     if (typeof hex !== 'string') return null;
     const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(hex.trim());
@@ -156,6 +180,6 @@
   return {
     VERSION, conditionFor, normalizeState, effectiveHours, conditionVisuals,
     headingBearing, solar, buildEvent, parseHexColor, MOCK_STATE, DEFAULT_AVATAR, DEFAULT_SHIP,
-    MOTION_SCALE, BASE_MOTION, motionAmplitudes,
+    MOTION_SCALE, BASE_MOTION, motionAmplitudes, buildAnchorsMessage,
   };
 });

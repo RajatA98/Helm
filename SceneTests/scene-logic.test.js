@@ -150,6 +150,32 @@ test('Reduce Motion makes the ship and the camera stiller still', () => {
   }
 });
 
+test('buildAnchorsMessage projects normalized device coords to CSS pixels', () => {
+  const msg = L.buildAnchorsMessage({ barrel: { x: 0, y: 0, z: 0.5 }, crate: { x: 1, y: -1, z: 0.9 } }, { width: 390, height: 844 });
+  assert.equal(msg.version, 1);
+  assert.equal(msg.type, 'anchors');
+  assert.deepEqual(msg.points.barrel, { x: 195, y: 422, visible: true });
+  assert.deepEqual(msg.points.crate, { x: 390, y: 844, visible: true });
+});
+
+test('buildAnchorsMessage hides points behind the camera or off screen', () => {
+  const msg = L.buildAnchorsMessage({
+    behind: { x: 0, y: 0, z: 1.2 },
+    offLeft: { x: -1.5, y: 0, z: 0.5 },
+    offTop: { x: 0, y: 1.4, z: 0.5 },
+  }, { width: 390, height: 844 });
+  assert.equal(msg.points.behind.visible, false);
+  assert.equal(msg.points.offLeft.visible, false);
+  assert.equal(msg.points.offTop.visible, false);
+});
+
+test('buildAnchorsMessage drops junk entries and tolerates an empty set', () => {
+  const msg = L.buildAnchorsMessage({ ok: { x: 0.5, y: 0.5, z: 0.1 }, junk: 'no', nan: { x: NaN, y: 0, z: 0 } }, { width: 100, height: 200 });
+  assert.deepEqual(Object.keys(msg.points), ['ok']);
+  assert.deepEqual(msg.points.ok, { x: 75, y: 50, visible: true });
+  assert.deepEqual(L.buildAnchorsMessage({}, { width: 100, height: 200 }).points, {});
+});
+
 test('a fixed mock state normalizes identically every time', () => {
   const a = JSON.stringify(L.normalizeState(L.MOCK_STATE));
   const b = JSON.stringify(L.normalizeState(JSON.parse(JSON.stringify(L.MOCK_STATE))));

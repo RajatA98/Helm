@@ -30,6 +30,11 @@ struct HelmScreen: View {
                     .transition(.opacity)
             }
 
+            AnchorPillsOverlay(anchors: bridge.anchors, tasksLeft: session.tasksLeft,
+                               onLog: { showLog = true },
+                               onCharts: { show("The charts unroll in Phase 3.") },
+                               onCove: { show("The Cove opens in Phase 6.") })
+
             VStack(spacing: 0) {
                 HelmHUD(now: now, openLeaks: session.openLeaks, goal: session.currentGoal,
                         onLongPressClock: { showDebug = true })
@@ -103,7 +108,7 @@ struct HelmScreen: View {
             show("The Cove opens in Phase 6.")
         case let .islandTapped(id):
             if id == session.headingGoalID { showLog = true } else { session.headingGoalID = id }
-        case .sceneReady, .sceneStats, .unknown:
+        case .sceneReady, .sceneStats, .anchors, .unknown:
             break
         }
     }

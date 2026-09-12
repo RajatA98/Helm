@@ -95,6 +95,16 @@ final class SceneBridgeTests: XCTestCase {
         XCTAssertEqual(bridge.log.last?.direction, .fromScene)
     }
 
+    func testAnchorsUpdateWithoutFloodingTheLog() {
+        let bridge = SceneBridge()
+        bridge.receive(body: ["version": 1, "type": "anchors", "points": ["barrel": ["x": 80.0, "y": 600.0, "visible": true]]])
+        bridge.receive(body: ["version": 1, "type": "anchors", "points": ["barrel": ["x": 82.0, "y": 601.0, "visible": true]]])
+        bridge.receive(body: ["version": 1, "type": "anchors", "points": ["barrel": ["x": 84.0, "y": 602.0, "visible": false]]])
+        XCTAssertEqual(bridge.anchors["barrel"], SceneAnchor(x: 84, y: 602, visible: false))
+        // Anchors arrive many times a second during a turn; the debug log records the first, not every one.
+        XCTAssertEqual(bridge.log.filter { $0.summary.contains("anchors") }.count, 1)
+    }
+
     func testLoadFailureIsRecorded() {
         let bridge = SceneBridge()
         bridge.markLoadFailed("timed out after 4 s")

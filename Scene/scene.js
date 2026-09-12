@@ -745,6 +745,16 @@
   }
 
   // ---------- picking
+  // Thumb-sized hit spheres around the small objects: drawn with nothing (no color, no depth
+  // write) but still raycast, so a tap near the book or the charts counts.
+  const hitMat = new T.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, colorWrite: false });
+  function hitSphere(parent, x, y, z, r) {
+    const m = new T.Mesh(new T.SphereGeometry(r, 10, 8), hitMat);
+    m.position.set(x, y, z); m.castShadow = false; m.receiveShadow = false; parent.add(m); return m;
+  }
+  hitSphere(barrel, 0, 0.7, 0, 0.8);
+  hitSphere(crate, 0, 0.5, 0, 0.75);
+  const wheelHit = hitSphere(wheel, 0, 0, 0, 0.72);
   const ray = new T.Raycaster(); const ndc = new T.Vector2();
   function pickables() {
     const list = [
@@ -783,6 +793,44 @@
   // ---------- camera
   const camBase = { pos: new V3(0, DECK + 3.1, 4.6), look: new V3(0, DECK + 1.0, -6) };
   const tmpA = new V3(), tmpB = new V3(), Y_AXIS = new V3(0, 1, 0);
+
+  // ---------- anchors: where the barrel, crate, lighthouse and wheel are on screen
+  // Projected from the ship's rest pose (heading, list and sink, but no rocking) so the
+  // native pills stay put while the ship bobs. Posted only when they move.
+  const stillYaw = new T.Group(); const stillShip = new T.Group(); stillYaw.add(stillShip); stillShip.rotation.order = 'YXZ';
+  const stillCamera = new T.PerspectiveCamera(camera.fov, camera.aspect, camera.near, camera.far);
+  const ANCHOR_LOCAL = {
+    barrel: new V3(-1.25, DECK + 1.15, -1.3),
+    crate: new V3(1.25, DECK + 0.78, -1.35),
+    wheel: new V3(0, WHEEL_Y, WHEEL_Z),
+  };
+  const lighthouseWorld = new V3(-2, 21.5, 0).add(cove.position);
+  const anchorTmp = new V3();
+  let lastAnchors = null, lastAnchorsAt = 0;
+  function updateAnchors(yaw, nowMs) {
+    if (!host && !standalone) return;
+    if (nowMs - lastAnchorsAt < 100) return;
+    stillYaw.rotation.y = yaw;
+    stillShip.position.y = -0.05 - visuals.waterline * 0.9;
+    stillShip.rotation.set(visuals.sinking ? -0.08 : 0, 0, visuals.listDeg * D2R);
+    stillYaw.updateMatrixWorld(true);
+    stillCamera.fov = camera.fov; stillCamera.aspect = camera.aspect; stillCamera.updateProjectionMatrix();
+    stillCamera.position.copy(camBase.pos).applyAxisAngle(Y_AXIS, yaw);
+    stillCamera.lookAt(anchorTmp.copy(camBase.look).applyAxisAngle(Y_AXIS, yaw));
+    stillCamera.updateMatrixWorld(true);
+    const projected = {};
+    for (const name of Object.keys(ANCHOR_LOCAL)) {
+      anchorTmp.copy(ANCHOR_LOCAL[name]); stillShip.localToWorld(anchorTmp); anchorTmp.project(stillCamera);
+      projected[name] = { x: anchorTmp.x, y: anchorTmp.y, z: anchorTmp.z };
+    }
+    anchorTmp.copy(lighthouseWorld).project(stillCamera);
+    projected.lighthouse = { x: anchorTmp.x, y: anchorTmp.y, z: anchorTmp.z };
+    const msg = L.buildAnchorsMessage(projected, { width: vw, height: vh });
+    const key = JSON.stringify(msg.points);
+    if (key === lastAnchors) return;
+    lastAnchors = key; lastAnchorsAt = nowMs;
+    if (host) host.postMessage(msg);
+  }
 
   // ---------- motion (subtle by design; stiller under Reduce Motion)
   const reduceMotionQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
@@ -836,6 +884,7 @@
     camera.rotateZ(-ship.rotation.z * motion.cameraRoll);
     oceanUniforms.uCam.value.copy(camera.position);
     sky.position.copy(camera.position);
+    updateAnchors(yaw, nowMs);
 
     const kd = keyLight.userData.dir || new V3(0, 1, 0);
     keyLight.target.position.set(0, DECK, -1).applyAxisAngle(Y_AXIS, yaw);

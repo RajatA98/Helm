@@ -80,6 +80,24 @@ final class SceneContractTests: XCTestCase {
         }
     }
 
+    func testAnchorsEventDecodesEveryWellFormedPoint() throws {
+        let json = #"{"version":1,"type":"anchors","points":{"barrel":{"x":80.5,"y":610,"visible":true},"crate":{"x":300,"y":615.2,"visible":false}}}"#
+        let envelope = try SceneEventEnvelope(json: Data(json.utf8))
+        XCTAssertEqual(envelope.event, .anchors([
+            "barrel": SceneAnchor(x: 80.5, y: 610, visible: true),
+            "crate": SceneAnchor(x: 300, y: 615.2, visible: false),
+        ]))
+    }
+
+    func testAnchorsEventToleratesAMissingOrBrokenPoint() throws {
+        // A point without coordinates is dropped; the others still arrive. A missing "points" is an empty set.
+        let json = #"{"version":1,"type":"anchors","points":{"barrel":{"x":80,"y":610,"visible":true},"wheel":{"visible":true},"crate":{"x":300}}}"#
+        let envelope = try SceneEventEnvelope(json: Data(json.utf8))
+        XCTAssertEqual(envelope.event, .anchors(["barrel": SceneAnchor(x: 80, y: 610, visible: true)]))
+        let none = try SceneEventEnvelope(json: Data(#"{"version":1,"type":"anchors"}"#.utf8))
+        XCTAssertEqual(none.event, .anchors([:]))
+    }
+
     func testUnknownEventTypeIsToleratedNotThrown() throws {
         let envelope = try SceneEventEnvelope(json: Data(#"{"version":1,"type":"dance","tempo":3}"#.utf8))
         XCTAssertEqual(envelope.event, .unknown(type: "dance"))

@@ -122,6 +122,20 @@ public struct SceneState: Codable, Equatable, Sendable {
 
 // MARK: - Events the scene sends to the app
 
+/// Where an object in the scene is on screen, in points (the web view is laid out 1:1 with the app).
+public struct SceneAnchor: Codable, Equatable, Sendable {
+    public var x: Double
+    public var y: Double
+    /// False when the object is behind the camera or off screen; the app hides its button.
+    public var visible: Bool
+
+    public init(x: Double, y: Double, visible: Bool) {
+        self.x = x
+        self.y = y
+        self.visible = visible
+    }
+}
+
 public enum SceneEvent: Equatable, Sendable {
     case sceneReady
     case sceneStats(fps: Double, loadMs: Double)
@@ -130,6 +144,8 @@ public enum SceneEvent: Equatable, Sendable {
     case crateTapped
     case lighthouseTapped
     case islandTapped(id: String)
+    /// Screen positions of the barrel, crate, lighthouse and wheel, keyed by name. Sent when they move.
+    case anchors([String: SceneAnchor])
     /// An event type this build doesn't know. Logged, never fatal.
     case unknown(type: String)
 }
@@ -163,17 +179,31 @@ public struct SceneEventEnvelope: Equatable, Sendable {
             event = .islandTapped(id: id)
         case "sceneStats":
             event = .sceneStats(fps: raw.fps ?? 0, loadMs: raw.loadMs ?? 0)
+        case "anchors":
+            // A point missing its coordinates is dropped; the rest still arrive.
+            var points: [String: SceneAnchor] = [:]
+            for (name, p) in raw.points ?? [:] {
+                if let x = p.x, let y = p.y { points[name] = SceneAnchor(x: x, y: y, visible: p.visible ?? false) }
+            }
+            event = .anchors(points)
         default:
             event = .unknown(type: raw.type)
         }
     }
 
     private struct RawEvent: Decodable {
-        enum CodingKeys: String, CodingKey { case version, type, id, fps, loadMs }
+        enum CodingKeys: String, CodingKey { case version, type, id, fps, loadMs, points }
         let version: Int
         let type: String
         let id: String?
         let fps: Double?
         let loadMs: Double?
+        let points: [String: RawPoint]?
+    }
+
+    private struct RawPoint: Decodable {
+        let x: Double?
+        let y: Double?
+        let visible: Bool?
     }
 }

@@ -41,6 +41,9 @@ final class SceneBridge {
     private(set) var latestStats: Stats?
     private(set) var log: [LogEntry] = []
     private(set) var lastSentState: SceneState?
+    /// Where the barrel, crate, lighthouse and wheel are on screen right now, from the scene.
+    private(set) var anchors: [String: SceneAnchor] = [:]
+    private var loggedAnchors = false
 
     /// Called with each compatible event from the scene.
     var onEvent: ((SceneEvent) -> Void)?
@@ -101,6 +104,13 @@ final class SceneBridge {
             append(.fromScene, "sceneStats fps=\(fps) loadMs=\(loadMs)")
         case let .islandTapped(id):
             append(.fromScene, "islandTapped \(id)")
+        case let .anchors(points):
+            anchors = points
+            // Anchors stream during a turn; logging every one would push everything else out of the ring buffer.
+            if !loggedAnchors {
+                loggedAnchors = true
+                append(.fromScene, "anchors (\(points.count) points; later updates not logged)")
+            }
         case let .unknown(type):
             append(.fromScene, "unknown event \(type)")
         case .wheelTurned, .barrelTapped, .crateTapped, .lighthouseTapped:
